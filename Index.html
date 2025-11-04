@@ -5,401 +5,617 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CancerRada | Breast Cancer Prediction & Support in Kenya</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --primary: #e75480; /* Soft pink */
-            --secondary: #ffb6c1; /* Light pink */
-            --accent: #9370db; /* Soft purple */
-            --light: #fff5f7; /* Very light pink */
-            --dark: #4a4a4a;
+            --primary: #e75480;
+            --secondary: #ffb6c1;
+            --accent: #d8a7e0;
+            --light: #fff5f7;
+            --dark: #5a4a6a;
             --success: #8bc34a;
             --warning: #ff9800;
             --danger: #f44336;
             --info: #2196f3;
+            --gold: #ffd700;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background-color: #fff;
             color: #333;
             line-height: 1.6;
+            overflow-x: hidden;
         }
-        
+
         .container {
             width: 90%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 15px;
         }
-        
+
         header {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.2rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
             z-index: 100;
+            animation: fadeInDown 0.8s ease;
         }
-        
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
-        
+
         .logo h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        
-        .logo-icon {
             font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
         }
-        
+
+        .logo-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         nav ul {
             display: flex;
             list-style: none;
         }
-        
+
         nav ul li {
-            margin-left: 1.5rem;
+            margin-left: 1.8rem;
+            position: relative;
         }
-        
+
         nav ul li a {
             color: white;
             text-decoration: none;
             font-weight: 500;
-            transition: opacity 0.3s;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+            position: relative;
         }
-        
-        nav ul li a:hover {
-            opacity: 0.8;
+
+        nav ul li a:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: width 0.3s ease;
         }
-        
+
+        nav ul li a:hover:after {
+            width: 100%;
+        }
+
         .hero {
-            background: linear-gradient(rgba(231, 84, 128, 0.8), rgba(147, 112, 219, 0.8)), url('https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background: linear-gradient(rgba(231, 84, 128, 0.85), rgba(216, 167, 224, 0.85)), url('https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 4rem 0;
+            padding: 6rem 0;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
         .hero h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+            font-size: 3.2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInUp 1s ease;
         }
-        
+
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             max-width: 700px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 1s ease 0.2s both;
         }
-        
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* IMPROVED BUTTON STYLES FOR RESPONSIVENESS */
         .btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            background-color: white;
+            color: var(--primary);
+            padding: 1rem 2.2rem;
             border: none;
             border-radius: 50px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease 0.4s both;
+            text-align: center;
+            min-height: 54px; /* Minimum touch target size */
+            flex-wrap: wrap;
+            word-break: break-word;
+            white-space: normal;
         }
-        
+
         .btn:hover {
-            background-color: var(--accent);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
-        
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
         .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
             background-color: white;
             color: var(--primary);
         }
-        
-        .btn-secondary:hover {
-            background-color: var(--light);
+
+        .btn-tip {
+            background-color: var(--gold);
+            color: var(--dark);
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            margin: 0.5rem;
+            animation: bounce 2s infinite;
+            min-height: auto; /* Override for smaller buttons */
         }
-        
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
         section {
-            padding: 4rem 0;
+            padding: 5rem 0;
+            position: relative;
         }
-        
+
         .section-title {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
         }
-        
+
         .section-title h2 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            display: inline-block;
         }
-        
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+
         .section-title p {
-            color: #666;
+            color: var(--dark);
             max-width: 700px;
             margin: 0 auto;
+            font-size: 1.1rem;
         }
-        
+
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
         }
-        
+
         .feature-card {
             background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
             text-align: center;
+            border: 1px solid rgba(231, 84, 128, 0.1);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
         .feature-card:hover {
             transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
         }
-        
+
         .feature-icon {
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--primary);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--light);
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            transition: all 0.3s ease;
         }
-        
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+
         .feature-card h3 {
             margin-bottom: 1rem;
             color: var(--dark);
+            font-size: 1.4rem;
         }
-        
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
         .calculator {
             background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            max-width: 800px;
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 900px;
             margin: 0 auto;
+            border: 1px solid rgba(231, 84, 128, 0.1);
+            position: relative;
         }
-        
+
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
-        
+
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.7rem;
             font-weight: 500;
+            color: var(--dark);
         }
-        
+
         .form-control {
             width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
             font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(231, 84, 128, 0.1);
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 1.5rem;
         }
-        
+
         .form-check {
             display: flex;
             align-items: center;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.7rem;
         }
-        
+
         .form-check input {
-            margin-right: 0.5rem;
+            margin-right: 0.7rem;
         }
-        
+
         .image-upload {
             border: 2px dashed var(--secondary);
             border-radius: 10px;
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             margin-bottom: 1.5rem;
             background-color: var(--light);
+            transition: all 0.3s ease;
         }
-        
+
+        .image-upload:hover {
+            border-color: var(--primary);
+            background-color: rgba(231, 84, 128, 0.05);
+        }
+
         .upload-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: var(--primary);
             margin-bottom: 1rem;
         }
-        
+
         .upload-btn {
             background-color: var(--primary);
             color: white;
-            padding: 0.6rem 1.2rem;
+            padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 1rem;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-height: 50px;
         }
-        
+
         .upload-btn:hover {
             background-color: var(--accent);
+            transform: translateY(-2px);
         }
-        
+
         .uploaded-image {
             max-width: 100%;
             max-height: 300px;
             margin-top: 1rem;
-            border-radius: 5px;
+            border-radius: 8px;
             display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
+
         .result {
             display: none;
-            margin-top: 2rem;
-            padding: 1.5rem;
-            border-radius: 10px;
+            margin-top: 2.5rem;
+            padding: 2.5rem;
+            border-radius: 12px;
             text-align: center;
+            animation: fadeIn 0.5s ease;
         }
-        
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .result h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
         }
-        
+
         .result-low {
-            background-color: rgba(139, 195, 74, 0.1);
+            background: linear-gradient(135deg, rgba(139, 195, 74, 0.1), rgba(139, 195, 74, 0.05));
             border: 1px solid var(--success);
         }
-        
+
         .result-medium {
-            background-color: rgba(255, 152, 0, 0.1);
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.05));
             border: 1px solid var(--warning);
         }
-        
+
         .result-high {
-            background-color: rgba(244, 67, 54, 0.1);
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.05));
             border: 1px solid var(--danger);
         }
-        
+
         .probability-meter {
             width: 100%;
-            height: 30px;
+            height: 25px;
             background-color: #f0f0f0;
-            border-radius: 15px;
-            margin: 1rem 0;
+            border-radius: 12px;
+            margin: 1.5rem 0;
             overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+
         .probability-fill {
             height: 100%;
-            border-radius: 15px;
-            transition: width 0.5s ease;
+            border-radius: 12px;
+            transition: width 1s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        
+
         .probability-text {
-            font-weight: bold;
-            margin-top: 0.5rem;
+            font-weight: 700;
+            margin-top: 0.7rem;
+            font-size: 1.1rem;
         }
-        
+
         .testimonials {
             background-color: var(--light);
+            position: relative;
         }
-        
+
+        .testimonials:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,80 Q50,100 0,80 Z" fill="rgba(255,255,255,0.8)"/></svg>');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: bottom;
+        }
+
         .testimonial-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
+            position: relative;
+            z-index: 1;
         }
-        
+
         .testimonial-card {
             background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             position: relative;
+            transition: all 0.3s ease;
         }
-        
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
         .testimonial-card:before {
-            content: """;
+            content: " ";
             font-size: 5rem;
             color: var(--secondary);
             position: absolute;
             top: -10px;
-            left: 10px;
+            left: 15px;
             opacity: 0.3;
+            font-family: 'Playfair Display', serif;
         }
-        
+
         .testimonial-content {
             margin-bottom: 1.5rem;
             font-style: italic;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
         }
-        
+
         .testimonial-author {
             display: flex;
             align-items: center;
         }
-        
+
         .author-avatar {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background-color: var(--secondary);
-            margin-right: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            margin-right: 1.2rem;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        
+
         .resources {
             background-color: white;
         }
-        
+
         .resource-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
         }
-        
+
         .resource-card {
             background-color: var(--light);
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(231, 84, 128, 0.1);
         }
-        
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        }
+
         .resource-img {
             height: 200px;
             background-size: cover;
             background-position: center;
+            transition: all 0.5s ease;
         }
-        
+
+        .resource-card:hover .resource-img {
+            transform: scale(1.05);
+        }
+
         .resource-content {
-            padding: 1.5rem;
+            padding: 2rem;
         }
-        
+
         .resource-content h3 {
             margin-bottom: 1rem;
             color: var(--primary);
+            font-size: 1.3rem;
         }
-        
+
         /* Modal Styles */
         .modal {
             display: none;
@@ -411,283 +627,855 @@
             background-color: rgba(0,0,0,0.7);
             z-index: 1000;
             overflow-y: auto;
+            animation: fadeIn 0.3s ease;
         }
-        
+
         .modal-content {
             background-color: white;
             margin: 5% auto;
-            padding: 2rem;
-            border-radius: 10px;
+            padding: 3rem;
+            border-radius: 20px;
             width: 90%;
-            max-width: 700px;
+            max-width: 900px;
             position: relative;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s ease;
         }
-        
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .close-modal {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 1.5rem;
+            top: 20px;
+            right: 20px;
+            font-size: 1.8rem;
             cursor: pointer;
             color: var(--dark);
             transition: color 0.3s;
+            background: var(--light);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
+
         .close-modal:hover {
             color: var(--primary);
+            background: rgba(231, 84, 128, 0.1);
         }
-        
+
         .modal-title {
             color: var(--primary);
             margin-bottom: 1.5rem;
             border-bottom: 2px solid var(--secondary);
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.7rem;
+            font-size: 1.8rem;
+            font-family: 'Playfair Display', serif;
         }
-        
-        .center-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        .center-list li {
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .center-list li:last-child {
-            border-bottom: none;
-        }
-        
-        .center-name {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .center-location {
-            color: #666;
-        }
-        
-        .center-contact {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
-        
-        .support-group-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        .support-group-list li {
-            padding: 1.5rem;
-            border-bottom: 1px solid #eee;
-            background-color: var(--light);
-            margin-bottom: 1rem;
-            border-radius: 8px;
-        }
-        
-        .support-group-list li:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        
-        .group-name {
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .group-schedule {
-            font-style: italic;
-            color: #666;
-            margin-bottom: 0.5rem;
-        }
-        
-        .financial-options {
+
+        /* NEW: Support Groups Styles */
+        .support-groups-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
-        
-        .financial-option {
-            background-color: var(--light);
+
+        .support-group-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(231, 84, 128, 0.1);
+        }
+
+        .support-group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .support-group-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
             padding: 1.5rem;
-            border-radius: 8px;
             text-align: center;
         }
-        
-        .financial-option h4 {
+
+        .support-group-header h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .support-group-body {
+            padding: 1.5rem;
+        }
+
+        .support-group-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #555;
+        }
+
+        .support-group-detail i {
+            width: 24px;
+            margin-right: 10px;
             color: var(--primary);
+        }
+
+        .support-group-description {
+            margin: 1.5rem 0;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .support-group-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+
+        .support-group-actions .btn {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            font-size: 0.9rem;
+            min-height: 45px;
+        }
+
+        .join-form {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: var(--light);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .join-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .join-form h4 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+        }
+
+        /* NEW: Educational Resources Styles */
+        .resources-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .resource-item {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(231, 84, 128, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .resource-icon {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 2.5rem;
+        }
+
+        .resource-details {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-details h3 {
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .resource-description {
+            margin-bottom: 1.5rem;
+            color: #666;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
             margin-bottom: 1rem;
         }
-        
+
+        .resource-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .resource-actions .btn {
+            flex: 1;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+            min-height: 42px;
+        }
+
+        .download-all-section {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--light), white);
+            border-radius: 15px;
+            border: 1px solid rgba(231, 84, 128, 0.1);
+        }
+
+        /* Prevention Tips Popup */
+        .prevention-tip {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 99;
+            max-width: 350px;
+            animation: slideInRight 0.5s ease, pulseTip 3s infinite;
+            cursor: pointer;
+            display: none;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulseTip {
+            0%, 100% { box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 10px 30px rgba(231, 84, 128, 0.4); }
+        }
+
+        .prevention-tip h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .prevention-tip p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .close-tip {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .close-tip:hover {
+            opacity: 1;
+        }
+
         /* Form Section Styles */
         .form-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            border-radius: 10px;
+            margin-bottom: 2.5rem;
+            padding: 2.5rem;
+            border-radius: 12px;
             background-color: var(--light);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
         }
-        
+
+        .form-section:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
         .form-section-title {
             color: var(--primary);
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--secondary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.7rem;
+            border-bottom: 1px solid rgba(231, 84, 128, 0.2);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
         }
-        
+
         .file-upload {
             border: 2px dashed var(--secondary);
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1.8rem;
             text-align: center;
             margin-top: 1rem;
             background-color: white;
+            transition: all 0.3s ease;
         }
-        
+
+        .file-upload:hover {
+            border-color: var(--primary);
+            background-color: rgba(231, 84, 128, 0.05);
+        }
+
         .file-upload-icon {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.7rem;
         }
-        
+
         .file-name {
-            margin-top: 0.5rem;
+            margin-top: 0.7rem;
             font-style: italic;
             color: #666;
         }
-        
-        .download-section {
+
+        .download-section, .peer-group-section {
             text-align: center;
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background-color: var(--light);
-            border-radius: 10px;
+            margin: 3rem 0;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, var(--light), white);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(231, 84, 128, 0.1);
+            transition: all 0.3s ease;
         }
-        
-        .download-btn {
-            background-color: var(--success);
+
+        .download-section:hover, .peer-group-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .download-btn, .peer-group-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
-            padding: 0.8rem 1.5rem;
+            padding: 1rem 2.2rem;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.7rem;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 84, 128, 0.3);
+            min-height: 50px;
         }
-        
-        .download-btn:hover {
-            background-color: #7cb342;
-            transform: translateY(-2px);
+
+        .download-btn:hover, .peer-group-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(231, 84, 128, 0.4);
         }
-        
-        .peer-group-section {
-            text-align: center;
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background-color: var(--light);
-            border-radius: 10px;
-        }
-        
-        .peer-group-btn {
-            background-color: var(--accent);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .peer-group-btn:hover {
-            background-color: #8364d3;
-            transform: translateY(-2px);
-        }
-        
+
         footer {
-            background-color: var(--dark);
+            background: linear-gradient(135deg, var(--dark), #4a3a5a);
             color: white;
-            padding: 3rem 0 1rem;
+            padding: 4rem 0 1.5rem;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        footer:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+        }
+
         .footer-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
         }
-        
+
         .footer-column h3 {
             margin-bottom: 1.5rem;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            color: white;
+            font-family: 'Playfair Display', serif;
         }
-        
+
         .footer-column ul {
             list-style: none;
         }
-        
+
         .footer-column ul li {
             margin-bottom: 0.8rem;
         }
-        
+
         .footer-column ul li a {
             color: #ddd;
             text-decoration: none;
             transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
+
         .footer-column ul li a:hover {
             color: white;
+            transform: translateX(5px);
         }
-        
+
         .copyright {
             text-align: center;
             padding-top: 2rem;
-            border-top: 1px solid #444;
+            border-top: 1px solid rgba(255,255,255,0.1);
             font-size: 0.9rem;
             color: #aaa;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .floating-1 {
+            top: 10%;
+            left: 5%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+        }
+
+        .floating-2 {
+            top: 20%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+            animation-delay: 2s;
+        }
+
+        .floating-3 {
+            bottom: 15%;
+            left: 15%;
+            width: 60px;
+            height: 60px;
+            animation-delay: 4s;
+        }
+
+        /* AI Assistant Styles */
+        .ai-assistant {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        .ai-chat-container {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ai-chat-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .ai-chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .ai-message {
+            max-width: 80%;
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: var(--light);
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message.bot {
+            align-self: flex-start;
+            background: #f0f0f0;
+            border-bottom-left-radius: 5px;
+        }
+
+        .ai-chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .ai-chat-input input {
+            flex: 1;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .ai-chat-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            min-height: 40px;
+        }
+
+        /* Health Mapping Styles */
+        .health-map {
+            height: 400px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Risk Tracker Styles */
+        .risk-tracker {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .risk-timeline {
+            margin-top: 1.5rem;
+        }
+
+        .risk-point {
+            display: flex;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .risk-point:before {
+            content: '';
+            position: absolute;
+            left: 25px;
+            top: 0;
+            bottom: -1.5rem;
+            width: 2px;
+            background: #eee;
+        }
+
+        .risk-point:last-child:before {
+            display: none;
+        }
+
+        .risk-date {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-details {
+            flex: 1;
+            padding: 0.5rem 0;
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-level.low {
+            background: rgba(139, 195, 74, 0.2);
+            color: var(--success);
+        }
+
+        .risk-level.medium {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .risk-level.high {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        /* NEW: Button groups for better mobile layout */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        /* NEW: Enhanced responsive styles */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
                 text-align: center;
+                gap: 1rem;
             }
-            
+
             nav ul {
-                margin-top: 1rem;
+                gap: 1rem;
+                flex-wrap: wrap;
                 justify-content: center;
             }
-            
+
+            nav ul li {
+                margin-left: 0.8rem;
+                margin-right: 0.8rem;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .hero h2 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title h2 {
                 font-size: 2rem;
             }
-            
+
             .modal-content {
                 width: 95%;
                 margin: 10% auto;
+                padding: 2rem;
+            }
+
+            .prevention-tip {
+                right: 15px;
+                bottom: 15px;
+                max-width: 300px;
+            }
+
+            .ai-chat-container {
+                width: 300px;
+                height: 400px;
+                left: 15px;
+                bottom: 80px;
+            }
+
+            .ai-assistant {
+                left: 15px;
+                bottom: 15px;
+            }
+
+            /* IMPROVED BUTTON RESPONSIVENESS */
+            .btn {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                min-height: 50px;
+                width: 100%; /* Full width on mobile for easier tapping */
+                margin: 0.5rem 0;
+            }
+            
+            /* Specific adjustments for hero section buttons */
+            .hero .btn {
+                width: auto; /* Keep original width in hero section */
+                min-width: 200px; /* Ensure minimum width */
+            }
+            
+            /* Form buttons should remain full width */
+            .calculator .btn, 
+            .form-section .btn,
+            .modal-content .btn {
+                width: 100%;
+            }
+            
+            /* Button groups should stack vertically */
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            /* Fix for risk tracker buttons */
+            .risk-tracker .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Resource card button improvements */
+            .resource-card .btn {
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            /* Support groups responsive styles */
+            .support-groups-container {
+                grid-template-columns: 1fr;
+            }
+
+            .support-group-actions {
+                flex-direction: column;
+            }
+
+            /* Educational resources responsive styles */
+            .resources-container {
+                grid-template-columns: 1fr;
+            }
+
+            .resource-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* NEW: Additional responsive improvements for very small screens */
+        @media (max-width: 480px) {
+            .hero .btn {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .btn-group {
+                width: 100%;
+            }
+            
+            .calculator {
+                padding: 1.5rem;
+            }
+            
+            .feature-card, .testimonial-card, .resource-card {
                 padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Prevention Tips Popup -->
+    <div class="prevention-tip" id="prevention-tip">
+        <span class="close-tip" id="close-tip">&times;</span>
+        <h4><i class="fas fa-lightbulb"></i> Prevention Tip</h4>
+        <p id="tip-content">Regular self-exams can help detect breast cancer early. Learn the proper technique!</p>
+    </div>
+
+    <!-- AI Assistant -->
+    <div class="ai-assistant" id="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="ai-chat-container" id="ai-chat">
+        <div class="ai-chat-header">
+            <i class="fas fa-robot"></i>
+            <h3>CancerRada Assistant</h3>
+        </div>
+        <div class="ai-chat-messages" id="ai-messages">
+            <div class="ai-message bot">
+                Hello! I'm CancerRada Assistant. How can I help you with breast cancer information today?
+            </div>
+        </div>
+        <div class="ai-chat-input">
+            <input type="text" id="ai-input" placeholder="Ask about breast cancer...">
+            <button id="ai-send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -700,7 +1488,7 @@
                         <li><a href="#home">Home</a></li>
                         <li><a href="#calculator">Risk Assessment</a></li>
                         <li><a href="#image-screening">Image Screening</a></li>
-                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#health-mapping">Health Mapping</a></li>
                         <li><a href="#resources">Resources</a></li>
                     </ul>
                 </nav>
@@ -709,35 +1497,74 @@
     </header>
 
     <section class="hero" id="home">
+        <div class="floating-element floating-1"></div>
+        <div class="floating-element floating-2"></div>
+        <div class="floating-element floating-3"></div>
         <div class="container">
             <h2>Early Detection Saves Lives</h2>
             <p>Assess your breast cancer risk with CancerRada's specialized tool designed for both men and women in Kenya. Get personalized insights and connect with local healthcare resources.</p>
-            <a href="#calculator" class="btn">Check Your Risk Now</a>
-            <a href="#image-screening" class="btn btn-secondary">Try Image Screening</a>
+            <div class="btn-group">
+                <a href="#calculator" class="btn btn-primary">
+                    <i class="fas fa-calculator"></i> Check Your Risk Now
+                </a>
+                <a href="#image-screening" class="btn btn-secondary">
+                    <i class="fas fa-camera"></i> Try Image Screening
+                </a>
+            </div>
+            <button class="btn btn-tip" id="learn-prevention">
+                <i class="fas fa-heart"></i> Learn Prevention Tips
+            </button>
         </div>
     </section>
 
     <section id="features">
         <div class="container">
             <div class="section-title">
-                <h2>Why Early Detection Matters</h2>
-                <p>Breast cancer is treatable when detected early. CancerRada helps you understand your risk factors and take proactive steps.</p>
+                <h2>How CancerRada Helps You</h2>
+                <p>Our comprehensive platform provides tools and resources to support your breast health journey</p>
             </div>
             <div class="features">
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-female"></i><i class="fas fa-male"></i></div>
-                    <h3>For Men & Women</h3>
-                    <p>While less common, men can also develop breast cancer. Our assessment tool is designed for all genders.</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Risk Assessment</h3>
+                    <p>Use our specialized calculator to understand your personal breast cancer risk factors based on your health history and lifestyle.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-flag"></i></div>
-                    <h3>Kenya-Focused</h3>
-                    <p>Our resources and recommendations are tailored to the Kenyan healthcare context and available services.</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Image Screening</h3>
+                    <p>Upload breast images for preliminary analysis using our AI-powered screening tool (not a replacement for medical diagnosis).</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon"><i class="fas fa-search"></i></div>
-                    <h3>Early Detection</h3>
-                    <p>Identify potential risk factors early and learn about screening options available in Kenya.</p>
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>Local Resources</h3>
+                    <p>Find breast cancer screening centers, support groups, and healthcare providers across Kenya.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Assistant</h3>
+                    <p>Get personalized answers to your breast cancer questions from our CancerRada Assistant.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Risk Tracker</h3>
+                    <p>Monitor your risk factors over time and track improvements as you adopt healthier habits.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-map"></i>
+                    </div>
+                    <h3>Health Mapping</h3>
+                    <p>Visualize breast cancer incidence and resources across different regions of Kenya.</p>
                 </div>
             </div>
         </div>
@@ -747,255 +1574,125 @@
         <div class="container">
             <div class="section-title">
                 <h2>Breast Cancer Risk Assessment</h2>
-                <p>Complete this comprehensive questionnaire to understand your potential risk factors. This tool is for educational purposes only and not a medical diagnosis.</p>
+                <p>Answer these questions to understand your potential risk factors</p>
             </div>
-            
-            <!-- Download Section -->
-            <div class="download-section">
-                <h3>Need to fill out the form offline?</h3>
-                <p>Download our printable assessment form to complete at your convenience and bring to your healthcare provider.</p>
-                <button class="download-btn" id="download-form-btn">
-                    <i class="fas fa-download"></i> Download Assessment Form
-                </button>
-            </div>
-            
-            <!-- Peer Group Section -->
-            <div class="peer-group-section">
-                <h3>Connect with Others</h3>
-                <p>Join our peer support groups to connect with others who understand your journey.</p>
-                <button class="peer-group-btn" id="peer-group-btn">
-                    <i class="fas fa-users"></i> Join a Peer Support Group
-                </button>
-            </div>
-            
             <div class="calculator">
-                <form id="risk-form">
-                    <!-- Personal Information Section -->
-                    <div class="form-section">
-                        <h3 class="form-section-title">Personal Information</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <input type="text" class="form-control" id="firstName" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <input type="text" class="form-control" id="lastName" required>
-                            </div>
+                <form id="risk-calculator-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" class="form-control" min="18" max="100" required>
                         </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" class="form-control" required>
+                                <option value="">Select</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title"><i class="fas fa-history"></i> Family History</h3>
+                        <div class="form-check">
+                            <input type="checkbox" id="family-history">
+                            <label for="family-history">Close relative (mother, sister, daughter) with breast cancer</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="multiple-relatives">
+                            <label for="multiple-relatives">Multiple relatives with breast or ovarian cancer</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="male-relative">
+                            <label for="male-relative">Male relative with breast cancer</label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title"><i class="fas fa-user-md"></i> Personal Health History</h3>
+                        <div class="form-check">
+                            <input type="checkbox" id="previous-cancer">
+                            <label for="previous-cancer">Previous breast cancer diagnosis</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="biopsy">
+                            <label for="biopsy">Previous breast biopsy with abnormal cells</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dense-breasts">
+                            <label for="dense-breasts">Dense breast tissue (diagnosed by doctor)</label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3 class="form-section-title"><i class="fas fa-baby"></i> Reproductive History</h3>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="gender">Gender</label>
-                                <select class="form-control" id="gender" required>
-                                    <option value="">Select Gender</option>
-                                    <option value="female">Female</option>
-                                    <option value="male">Male</option>
+                                <label for="first-period">Age at first period</label>
+                                <select id="first-period" class="form-control">
+                                    <option value="">Select</option>
+                                    <option value="under-12">Under 12</option>
+                                    <option value="12-13">12-13</option>
+                                    <option value="14-or-over">14 or over</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="age">Age</label>
-                                <input type="number" class="form-control" id="age" min="1" max="120" required>
+                                <label for="first-child">Age at first child's birth</label>
+                                <select id="first-child" class="form-control">
+                                    <option value="">Select</option>
+                                    <option value="under-20">Under 20</option>
+                                    <option value="20-30">20-30</option>
+                                    <option value="over-30">Over 30</option>
+                                    <option value="no-children">No children</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">Email Address</label>
-                                <input type="email" class="form-control" id="email" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="county">County of Residence</label>
-                            <select class="form-control" id="county" required>
-                                <option value="">Select County</option>
-                                <option value="nairobi">Nairobi</option>
-                                <option value="mombasa">Mombasa</option>
-                                <option value="kisumu">Kisumu</option>
-                                <option value="nakuru">Nakuru</option>
-                                <option value="eldoret">Eldoret</option>
-                                <option value="other">Other</option>
-                            </select>
+                        <div class="form-check">
+                            <input type="checkbox" id="menopause">
+                            <label for="menopause">Gone through menopause</label>
                         </div>
                     </div>
 
-                    <!-- Family History Section -->
                     <div class="form-section">
-                        <h3 class="form-section-title">Family History</h3>
-                        <div class="form-group">
-                            <label>Has anyone in your family been diagnosed with breast cancer?</label>
-                            <div class="form-check">
-                                <input type="radio" id="family-no" name="family" value="no" required>
-                                <label for="family-no">No</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" id="family-relative" name="family" value="relative">
-                                <label for="family-relative">Yes, a relative (aunt, cousin, grandmother)</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" id="family-parent" name="family" value="parent">
-                                <label for="family-parent">Yes, a parent or sibling</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="radio" id="family-multiple" name="family" value="multiple">
-                                <label for="family-multiple">Yes, multiple family members</label>
-                            </div>
+                        <h3 class="form-section-title"><i class="fas fa-wine-bottle"></i> Lifestyle Factors</h3>
+                        <div class="form-check">
+                            <input type="checkbox" id="alcohol">
+                            <label for="alcohol">Regular alcohol consumption (more than 1 drink per day)</label>
                         </div>
-                        <div class="form-group">
-                            <label for="family-details">If yes, please provide details (age at diagnosis, relationship):</label>
-                            <textarea class="form-control" id="family-details" rows="3" placeholder="Provide details about family history..."></textarea>
+                        <div class="form-check">
+                            <input type="checkbox" id="smoking">
+                            <label for="smoking">Current or former smoker</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="exercise">
+                            <label for="exercise">Regular physical activity (at least 150 minutes per week)</label>
                         </div>
                     </div>
 
-                    <!-- Medical History Section -->
-                    <div class="form-section">
-                        <h3 class="form-section-title">Medical History</h3>
-                        <div class="form-group">
-                            <label>Previous Breast Conditions</label>
-                            <div class="form-check">
-                                <input type="checkbox" id="condition-none" name="condition" value="none">
-                                <label for="condition-none">None</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="condition-lumps" name="condition" value="lumps">
-                                <label for="condition-lumps">History of benign lumps</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="condition-biopsy" name="condition" value="biopsy">
-                                <label for="condition-biopsy">Previous breast biopsy</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="condition-dense" name="condition" value="dense">
-                                <label for="condition-dense">Dense breast tissue</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="condition-radiation" name="condition" value="radiation">
-                                <label for="condition-radiation">Previous chest radiation therapy</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Other Medical Conditions</label>
-                            <div class="form-check">
-                                <input type="checkbox" id="medical-diabetes" name="medical" value="diabetes">
-                                <label for="medical-diabetes">Diabetes</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="medical-hypertension" name="medical" value="hypertension">
-                                <label for="medical-hypertension">Hypertension</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="medical-heart" name="medical" value="heart">
-                                <label for="medical-heart">Heart Disease</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="medical-autoimmune" name="medical" value="autoimmune">
-                                <label for="medical-autoimmune">Autoimmune Disease</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Upload Medical Records (Optional)</label>
-                            <div class="file-upload">
-                                <div class="file-upload-icon">
-                                    <i class="fas fa-file-medical"></i>
-                                </div>
-                                <p>Upload relevant medical documents (PDF, JPG, PNG)</p>
-                                <input type="file" id="medical-records" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
-                                <button type="button" class="upload-btn" id="upload-medical-btn">Choose Files</button>
-                                <div class="file-name" id="medical-file-name">No file chosen</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Additional Risk Factors Section -->
-                    <div class="form-section">
-                        <h3 class="form-section-title">Additional Risk Factors</h3>
-                        <div class="form-group">
-                            <label>Lifestyle Factors</label>
-                            <div class="form-check">
-                                <input type="checkbox" id="alcohol" name="lifestyle" value="alcohol">
-                                <label for="alcohol">Regular alcohol consumption</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="smoking" name="lifestyle" value="smoking">
-                                <label for="smoking">Smoking</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="obesity" name="lifestyle" value="obesity">
-                                <label for="obesity">Obesity or overweight</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="sedentary" name="lifestyle" value="sedentary">
-                                <label for="sedentary">Sedentary lifestyle</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Reproductive History (for women)</label>
-                            <div class="form-check">
-                                <input type="checkbox" id="early-menarche" name="reproductive" value="early-menarche">
-                                <label for="early-menarche">Early menstruation (before age 12)</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="late-menopause" name="reproductive" value="late-menopause">
-                                <label for="late-menopause">Late menopause (after age 55)</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="first-child" name="reproductive" value="first-child">
-                                <label for="first-child">First child after age 30</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="no-pregnancy" name="reproductive" value="no-pregnancy">
-                                <label for="no-pregnancy">Never been pregnant</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" id="hormone-therapy" name="reproductive" value="hormone-therapy">
-                                <label for="hormone-therapy">Hormone replacement therapy</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="diet">Dietary Habits</label>
-                            <select class="form-control" id="diet">
-                                <option value="">Select Diet Type</option>
-                                <option value="balanced">Balanced diet</option>
-                                <option value="high-fat">High in processed/fatty foods</option>
-                                <option value="vegetarian">Vegetarian</option>
-                                <option value="vegan">Vegan</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn" style="width: 100%; background-color: var(--primary);">Calculate My Risk</button>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 2rem;">
+                        <i class="fas fa-chart-line"></i> Calculate My Risk
+                    </button>
                 </form>
-                
-                <div class="result" id="result-low">
-                    <h3>Low Risk Assessment</h3>
-                    <p>Based on the information provided, your risk appears to be low. However, regular self-exams and awareness are still important.</p>
+
+                <div class="result" id="result">
+                    <h3 id="result-title">Your Breast Cancer Risk Assessment</h3>
                     <div class="probability-meter">
-                        <div class="probability-fill" style="width: 15%; background-color: var(--success);"></div>
+                        <div class="probability-fill" id="probability-fill"></div>
                     </div>
-                    <div class="probability-text">Estimated Risk: 15%</div>
-                    <p><strong>Recommendation:</strong> Continue with regular breast awareness and consider clinical exams as part of routine health checks.</p>
-                </div>
-                
-                <div class="result" id="result-medium">
-                    <h3>Moderate Risk Assessment</h3>
-                    <p>Based on the information provided, you have some factors that may increase your risk.</p>
-                    <div class="probability-meter">
-                        <div class="probability-fill" style="width: 45%; background-color: var(--warning);"></div>
+                    <p class="probability-text" id="probability-text">Estimated Risk: 0%</p>
+                    <p id="result-description">Based on your responses, here is your personalized risk assessment.</p>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="save-risk">
+                            <i class="fas fa-save"></i> Save to Risk Tracker
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadRiskAssessment()">
+                            <i class="fas fa-download"></i> Download Assessment
+                        </button>
+                        <button class="btn btn-secondary" id="show-resources">
+                            <i class="fas fa-map-marker-alt"></i> Find Local Resources
+                        </button>
                     </div>
-                    <div class="probability-text">Estimated Risk: 45%</div>
-                    <p><strong>Recommendation:</strong> Consider speaking with a healthcare provider about your risk factors and appropriate screening schedule.</p>
-                </div>
-                
-                <div class="result" id="result-high">
-                    <h3>Elevated Risk Assessment</h3>
-                    <p>Based on the information provided, you have several factors that may increase your breast cancer risk.</p>
-                    <div class="probability-meter">
-                        <div class="probability-fill" style="width: 72%; background-color: var(--danger);"></div>
-                    </div>
-                    <div class="probability-text">Estimated Risk: 72%</div>
-                    <p><strong>Recommendation:</strong> We strongly recommend consulting with a healthcare provider for personalized assessment and screening recommendations.</p>
                 </div>
             </div>
         </div>
@@ -1005,81 +1702,134 @@
         <div class="container">
             <div class="section-title">
                 <h2>AI-Powered Image Screening</h2>
-                <p>Upload an image for preliminary analysis. Our AI model can identify potential concerns with up to 85% accuracy.</p>
-                <p><small><em>Note: This is not a diagnostic tool. Always consult a healthcare professional for medical diagnosis.</em></small></p>
+                <p>Upload a breast image for preliminary analysis (not a replacement for medical diagnosis)</p>
             </div>
             <div class="calculator">
                 <div class="image-upload">
                     <div class="upload-icon">
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
-                    <h3>Upload Breast Image for Screening</h3>
-                    <p>Supported formats: JPG, PNG (Max 5MB)</p>
-                    <input type="file" id="image-input" accept="image/*" style="display: none;">
-                    <button type="button" class="upload-btn" id="choose-image-btn">Choose Image</button>
-                    <img id="uploaded-image" class="uploaded-image" src="" alt="Uploaded image">
+                    <h3>Upload Breast Image</h3>
+                    <p>Supported formats: JPG, PNG, JPEG (Max 5MB)</p>
+                    <input type="file" id="mammogram-upload" accept="image/*" style="display: none;">
+                    <button class="upload-btn" id="upload-trigger">
+                        <i class="fas fa-file-upload"></i> Choose Image
+                    </button>
+                    <div class="file-name" id="file-name">No file selected</div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="image-notes">Additional Notes (Optional)</label>
-                    <textarea class="form-control" id="image-notes" rows="3" placeholder="Describe any symptoms or concerns..."></textarea>
+
+                <img id="uploaded-image" class="uploaded-image" alt="Uploaded breast image">
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-primary" id="analyze-image" disabled>
+                        <i class="fas fa-search"></i> Analyze Image
+                    </button>
                 </div>
-                
-                <button type="button" class="btn" style="width: 100%; background-color: var(--accent);" id="analyze-image-btn">Analyze Image</button>
-                
+
                 <div class="result" id="image-result">
-                    <h3>Image Analysis Result</h3>
-                    <p id="analysis-text">Our preliminary analysis indicates:</p>
-                    <div class="probability-meter">
-                        <div class="probability-fill" id="analysis-meter" style="width: 0%; background-color: var(--info);"></div>
+                    <h3 id="image-result-title">Image Analysis Results</h3>
+                    <p id="image-result-description">Our preliminary analysis of your uploaded image.</p>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="find-specialists">
+                            <i class="fas fa-user-md"></i> Find Breast Specialists
+                        </button>
+                        <button class="btn btn-secondary" id="combined-analysis">
+                            <i class="fas fa-sync-alt"></i> Combine with Risk Assessment
+                        </button>
                     </div>
-                    <div class="probability-text" id="analysis-percentage">Estimated Concern: 0%</div>
-                    <p><strong>Disclaimer:</strong> This analysis is for informational purposes only with approximately 85% accuracy. Please consult a healthcare provider for proper diagnosis.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="testimonials" class="testimonials">
+    <section id="health-mapping">
         <div class="container">
             <div class="section-title">
-                <h2>Stories of Hope & Survival</h2>
-                <p>Read inspiring stories from Kenyans who detected breast cancer early and took action.</p>
+                <h2>Kenya Breast Health Mapping</h2>
+                <p>Visualize breast cancer incidence and resources across Kenya</p>
+            </div>
+            <div class="calculator">
+                <div class="health-map" id="health-map"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="county-select">Select County</label>
+                        <select id="county-select" class="form-control">
+                            <option value="">All Counties</option>
+                            <option value="nairobi">Nairobi</option>
+                            <option value="mombasa">Mombasa</option>
+                            <option value="kisumu">Kisumu</option>
+                            <option value="nakuru">Nakuru</option>
+                            <option value="kiambu">Kiambu</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="resource-type">Resource Type</label>
+                        <select id="resource-type" class="form-control">
+                            <option value="all">All Resources</option>
+                            <option value="screening">Screening Centers</option>
+                            <option value="treatment">Treatment Centers</option>
+                            <option value="support">Support Groups</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="risk-tracker">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem;"><i class="fas fa-chart-line"></i> Your Risk Evaluation Tracker</h3>
+                    <p>Track your breast cancer risk assessments over time to monitor changes and improvements.</p>
+
+                    <div class="risk-timeline" id="risk-timeline"></div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="clear-history">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>Stories of Hope & Support</h2>
+                <p>Read experiences from individuals who have used CancerRada</p>
             </div>
             <div class="testimonial-grid">
                 <div class="testimonial-card">
                     <div class="testimonial-content">
-                        "Using CancerRada's risk assessment tool prompted me to get checked. The doctors found early-stage cancer, and thanks to early detection, I'm now cancer-free after treatment."
+                        "CancerRada helped me understand my risk factors and encouraged me to get screened early. The early detection saved my life. I'm now 2 years cancer-free!"
                     </div>
                     <div class="testimonial-author">
-                        <div class="author-avatar">WM</div>
+                        <div class="author-avatar">MW</div>
                         <div>
-                            <h4>Wambui M.</h4>
-                            <p>Nairobi, 42</p>
+                            <h4>Mary Wanjiku</h4>
+                            <p>Nairobi, Kenya</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-content">
-                        "As a man, I never thought about breast cancer. CancerRada educated me about male breast cancer. When I noticed changes, I got checked immediately."
+                        "As a man, I never thought breast cancer was something I needed to worry about. CancerRada educated me about male breast cancer and helped me detect it early."
                     </div>
                     <div class="testimonial-author">
                         <div class="author-avatar">JK</div>
                         <div>
-                            <h4>John K.</h4>
-                            <p>Kisumu, 55</p>
+                            <h4>John Kamau</h4>
+                            <p>Kisumu, Kenya</p>
                         </div>
                     </div>
                 </div>
                 <div class="testimonial-card">
                     <div class="testimonial-content">
-                        "The image screening feature gave me peace of mind while waiting for my doctor's appointment. CancerRada's resources helped me find a support group that changed my journey."
+                        "The local resources directory connected me with a support group that has been invaluable during my treatment journey. Thank you CancerRada for this platform."
                     </div>
                     <div class="testimonial-author">
                         <div class="author-avatar">AO</div>
                         <div>
-                            <h4>Alice O.</h4>
-                            <p>Mombasa, 38</p>
+                            <h4>Alice Omondi</h4>
+                            <p>Mombasa, Kenya</p>
                         </div>
                     </div>
                 </div>
@@ -1087,160 +1837,154 @@
         </div>
     </section>
 
-    <section id="resources" class="resources">
+    <section class="resources" id="resources">
         <div class="container">
             <div class="section-title">
-                <h2>Resources & Support in Kenya</h2>
-                <p>Access information about breast cancer screening, treatment, and support services available in Kenya.</p>
+                <h2>Resources & Support</h2>
+                <p>Access helpful information and connect with healthcare providers in Kenya</p>
             </div>
             <div class="resource-grid">
                 <div class="resource-card">
                     <div class="resource-img" style="background-image: url('https://images.unsplash.com/photo-1551601651-2a8555f1a136?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
                     <div class="resource-content">
                         <h3>Screening Centers</h3>
-                        <p>Find locations across Kenya that offer mammograms, ultrasounds, and clinical breast exams.</p>
-                        <button type="button" class="btn" style="background-color: var(--primary);" id="find-center-btn">Find a Center</button>
+                        <p>Find accredited breast cancer screening centers across Kenya with information on services and costs.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" id="view-centers">
+                            <i class="fas fa-map-marker-alt"></i> View Centers
+                        </button>
                     </div>
                 </div>
                 <div class="resource-card">
                     <div class="resource-img" style="background-image: url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
                     <div class="resource-content">
                         <h3>Support Groups</h3>
-                        <p>Connect with others who have been affected by breast cancer for emotional support and shared experiences.</p>
-                        <button type="button" class="btn" style="background-color: var(--primary);" id="join-group-btn">Join a Group</button>
+                        <p>Connect with local and online support groups for emotional support and shared experiences.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" id="view-support-groups">
+                            <i class="fas fa-users"></i> Find Support
+                        </button>
                     </div>
                 </div>
                 <div class="resource-card">
-                    <div class="resource-img" style="background-image: url('https://images.unsplash.com/photo-1584467735871-8db9ac8d0918?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
+                    <div class="resource-img" style="background-image: url('https://images.unsplash.com/photo-1584467735871-8db9ac8d55b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');"></div>
                     <div class="resource-content">
-                        <h3>Financial Assistance</h3>
-                        <p>Information about programs that can help with the costs of screening, diagnosis, and treatment.</p>
-                        <button type="button" class="btn" style="background-color: var(--primary);" id="learn-more-btn">Learn More</button>
+                        <h3>Educational Materials</h3>
+                        <p>Download brochures, guides, and information about breast cancer prevention and early detection.</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;" id="view-educational-resources">
+                            <i class="fas fa-download"></i> Download Resources
+                        </button>
                     </div>
                 </div>
+            </div>
+
+            <div class="download-section">
+                <h3>Download Our Breast Health Guide</h3>
+                <p>Get our comprehensive guide to breast health, self-examination techniques, and risk reduction strategies.</p>
+                <button class="download-btn" onclick="downloadGuide()">
+                    <i class="fas fa-file-pdf"></i> Download Guide (PDF)
+                </button>
+            </div>
+
+            <div class="peer-group-section">
+                <h3>Join Our Peer Support Network</h3>
+                <p>Connect with others who have similar experiences in our private, moderated online community.</p>
+                <button class="peer-group-btn" onclick="joinSupportNetwork()">
+                    <i class="fas fa-comments"></i> Join Support Network
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Modal for Screening Centers -->
+    <!-- Screening Centers Modal -->
     <div id="centers-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal" id="close-centers-modal">&times;</span>
             <h2 class="modal-title">Breast Cancer Screening Centers in Kenya</h2>
-            <p>Here are some recommended screening centers across Kenya. Please call ahead to confirm services and book appointments.</p>
-            
-            <ul class="center-list">
-                <li>
-                    <div>
-                        <div class="center-name">Kenyatta National Hospital</div>
-                        <div class="center-location">Nairobi</div>
-                        <div class="center-contact">Phone: 020 272 6300 | Services: Mammography, Ultrasound, Biopsy</div>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <div class="center-name">Aga Khan University Hospital</div>
-                        <div class="center-location">Nairobi</div>
-                        <div class="center-contact">Phone: 020 366 2000 | Services: Mammography, MRI, Genetic Testing</div>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <div class="center-name">Moi Teaching and Referral Hospital</div>
-                        <div class="center-location">Eldoret</div>
-                        <div class="center-contact">Phone: 053 203 3471 | Services: Mammography, Clinical Exams</div>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <div class="center-name">Coast General Hospital</div>
-                        <div class="center-location">Mombasa</div>
-                        <div class="center-contact">Phone: 041 231 4206 | Services: Mammography, Ultrasound</div>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <div class="center-name">Nakuru Level 5 Hospital</div>
-                        <div class="center-location">Nakuru</div>
-                        <div class="center-contact">Phone: 051 221 5601 | Services: Clinical Exams, Referrals</div>
-                    </div>
-                </li>
-            </ul>
-            
-            <p><strong>Note:</strong> Many county hospitals now offer breast cancer screening services. Contact your local public hospital for information.</p>
-        </div>
-    </div>
-
-    <!-- Modal for Support Groups -->
-    <div id="groups-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-groups-modal">&times;</span>
-            <h2 class="modal-title">Breast Cancer Support Groups in Kenya</h2>
-            <p>Connecting with others who understand your journey can provide emotional support and practical advice.</p>
-            
-            <ul class="support-group-list">
-                <li>
-                    <div class="group-name">Kenya Breast Health Programme</div>
-                    <div class="group-schedule">Meets every 2nd Saturday of the month</div>
-                    <div>Location: Nairobi Hospital Conference Center</div>
-                    <div>Contact: breasthealthkenya@gmail.com | 0723 456 789</div>
-                </li>
-                <li>
-                    <div class="group-name">Mombasa Breast Cancer Survivors</div>
-                    <div class="group-schedule">Meets every Wednesday at 4 PM</div>
-                    <div>Location: Aga Khan Hospital, Mombasa</div>
-                    <div>Contact: 0733 987 654</div>
-                </li>
-                <li>
-                    <div class="group-name">Men's Breast Cancer Support Kenya</div>
-                    <div class="group-schedule">Virtual meetings every Friday at 6 PM</div>
-                    <div>Online platform: Zoom</div>
-                    <div>Contact: mensupportke@outlook.com</div>
-                </li>
-                <li>
-                    <div class="group-name">Eldoret Hope Circle</div>
-                    <div class="group-schedule">Meets every 1st and 3rd Tuesday</div>
-                    <div>Location: Moi Teaching and Referral Hospital</div>
-                    <div>Contact: 0712 345 678</div>
-                </li>
-            </ul>
-            
-            <p><strong>Online Resources:</strong> Follow "Breast Cancer Kenya" on social media for virtual support meetings and resources.</p>
-        </div>
-    </div>
-
-    <!-- Modal for Financial Assistance -->
-    <div id="financial-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-financial-modal">&times;</span>
-            <h2 class="modal-title">Financial Assistance for Breast Cancer Care</h2>
-            <p>Several organizations in Kenya provide financial support for screening, diagnosis, and treatment of breast cancer.</p>
-            
-            <div class="financial-options">
-                <div class="financial-option">
-                    <h4>National Hospital Insurance Fund (NHIF)</h4>
-                    <p>Covers breast cancer screening, chemotherapy, and surgery for members.</p>
-                    <p>Contact: 020 275 6000</p>
+            <div class="centers-list">
+                <div class="center-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Nairobi Hospital</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Argwings Kodhek Road, Nairobi</p>
+                    <p><i class="fas fa-phone"></i> 020-284-5000</p>
+                    <p><i class="fas fa-money-bill-wave"></i> Screening Cost: KES 3,500 - 7,000</p>
                 </div>
-                <div class="financial-option">
-                    <h4>Faraja Cancer Support Trust</h4>
-                    <p>Provides financial assistance for treatment and supportive care.</p>
-                    <p>Contact: 0709 932 000</p>
+                <div class="center-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Aga Khan University Hospital</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 3rd Parklands Avenue, Nairobi</p>
+                    <p><i class="fas fa-phone"></i> 020-366-2000</p>
+                    <p><i class="fas fa-money-bill-wave"></i> Screening Cost: KES 4,000 - 8,000</p>
                 </div>
-                <div class="financial-option">
-                    <h4>Women 4 Cancer Early Detection</h4>
-                    <p>Offers subsidized screening and diagnostic services.</p>
-                    <p>Contact: 0722 205 255</p>
+                <div class="center-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Kenyatta National Hospital</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Hospital Road, Nairobi</p>
+                    <p><i class="fas fa-phone"></i> 020-272-6300</p>
+                    <p><i class="fas fa-money-bill-wave"></i> Screening Cost: KES 1,500 - 3,000 (subsidized)</p>
+                </div>
+                <div class="center-item" style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">Moi Teaching and Referral Hospital</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Nandi Road, Eldoret</p>
+                    <p><i class="fas fa-phone"></i> 053-203-3471</p>
+                    <p><i class="fas fa-money-bill-wave"></i> Screening Cost: KES 2,000 - 4,000</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Prevention Tips Modal -->
+    <div id="prevention-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-prevention-modal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-shield-alt"></i> Breast Cancer Prevention Tips</h2>
+            <div class="prevention-tips-content">
+                <div class="prevention-tip-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-female"></i> Regular Self-Exams</h3>
+                    <p>Perform monthly breast self-exams to familiarize yourself with how your breasts normally look and feel. Report any changes to your healthcare provider immediately.</p>
+                </div>
+                <div class="prevention-tip-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-utensils"></i> Healthy Diet</h3>
+                    <p>Eat a balanced diet rich in fruits, vegetables, and whole grains. Limit alcohol consumption and processed foods. Maintain a healthy weight to reduce breast cancer risk.</p>
+                </div>
+                <div class="prevention-tip-item" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-running"></i> Physical Activity</h3>
+                    <p>Aim for at least 150 minutes of moderate exercise per week to maintain a healthy weight and reduce risk. Even brisk walking can make a difference.</p>
+                </div>
+                <div class="prevention-tip-item" style="padding: 1.5rem; background: var(--light); border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;"><i class="fas fa-calendar-alt"></i> Regular Check-ups</h3>
+                    <p>Schedule regular clinical breast exams and mammograms as recommended by your healthcare provider based on your age and risk factors.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Groups Modal -->
+    <div id="support-groups-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-support-groups-modal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-users"></i> Breast Cancer Support Groups</h2>
+            <p>Connect with others who understand your journey. Join a support group to share experiences, get emotional support, and learn from others.</p>
             
-            <h3 style="margin-top: 2rem; color: var(--primary);">Additional Resources</h3>
-            <ul style="padding-left: 1.5rem;">
-                <li><strong>County Governments:</strong> Many county health departments offer free cancer screening camps periodically</li>
-                <li><strong>Mission Hospitals:</strong> Often provide subsidized cancer care services</li>
-                <li><strong>Medical Charities:</strong> Organizations like Faraja Cancer Support Trust offer financial aid</li>
-                <li><strong>Corporate Sponsorships:</strong> Some companies sponsor employee cancer screening programs</li>
-            </ul>
+            <div class="support-groups-container" id="support-groups-container">
+                <!-- Support groups will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Educational Resources Modal -->
+    <div id="educational-resources-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-educational-resources-modal">&times;</span>
+            <h2 class="modal-title"><i class="fas fa-book-medical"></i> Educational Resources</h2>
+            <p>Download helpful materials about breast cancer prevention, early detection, treatment options, and living well after diagnosis.</p>
+            
+            <div class="resources-container" id="resources-container">
+                <!-- Educational resources will be dynamically added here -->
+            </div>
+
+            <div class="download-all-section">
+                <h3>Download All Resources</h3>
+                <p>Get our complete educational package with all materials in one convenient download.</p>
+                <button class="btn btn-primary" id="download-all-resources">
+                    <i class="fas fa-file-archive"></i> Download Complete Package (ZIP)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1249,228 +1993,948 @@
             <div class="footer-content">
                 <div class="footer-column">
                     <h3>CancerRada</h3>
-                    <p>Dedicated to raising breast cancer awareness and providing resources for early detection in Kenya.</p>
+                    <p>Empowering Kenyans with breast cancer awareness, early detection tools, and support resources.</p>
                 </div>
                 <div class="footer-column">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#calculator">Risk Assessment</a></li>
-                        <li><a href="#image-screening">Image Screening</a></li>
-                        <li><a href="#testimonials">Testimonials</a></li>
-                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="#calculator"><i class="fas fa-calculator"></i> Risk Assessment</a></li>
+                        <li><a href="#image-screening"><i class="fas fa-camera"></i> Image Screening</a></li>
+                        <li><a href="#resources"><i class="fas fa-book"></i> Resources</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>Contact</h3>
+                    <h3>Contact & Support</h3>
                     <ul>
-                        <li>Email: info@cancerrada.org</li>
-                        <li>Phone: +254 700 123 456</li>
-                        <li>Nairobi, Kenya</li>
+                        <li><a href="#"><i class="fas fa-phone"></i> Helpline: 0800 720 300</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i> info@cancerrada.co.ke</a></li>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Follow Us</h3>
+                    <ul>
+                        <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                        <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2023 CancerRada. This tool is for educational purposes only and not a substitute for professional medical advice.</p>
+                <p>&copy; 2023 CancerRada. This tool is for educational purposes only and not a substitute for professional medical advice, diagnosis, or treatment.</p>
             </div>
         </div>
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Button Event Listeners
+        // Support groups data
+        const supportGroups = [
+            {
+                id: 1,
+                name: "Nairobi Breast Cancer Warriors",
+                location: "Nairobi, Kenya",
+                meetingTime: "Every Tuesday, 6:00 PM - 7:30 PM",
+                meetingType: "In-person & Virtual",
+                description: "A supportive community for women at all stages of the breast cancer journey. We share experiences, coping strategies, and hope.",
+                contact: "nairobi.warriors@cancerrada.co.ke",
+                focus: "All stages"
+            },
+            {
+                id: 2,
+                name: "Mombasa Survivors Circle",
+                location: "Mombasa, Kenya",
+                meetingTime: "Every Thursday, 5:30 PM - 7:00 PM",
+                meetingType: "In-person",
+                description: "Connect with fellow survivors in a safe, confidential space. Share your story and find strength in community.",
+                contact: "mombasa.circle@cancerrada.co.ke",
+                focus: "Post-treatment"
+            },
+            {
+                id: 3,
+                name: "Kisumu Hope & Healing",
+                location: "Kisumu, Kenya",
+                meetingTime: "Every Saturday, 10:00 AM - 11:30 AM",
+                meetingType: "In-person",
+                description: "A welcoming group for those newly diagnosed or undergoing treatment. Find practical advice and emotional support.",
+                contact: "kisumu.hope@cancerrada.co.ke",
+                focus: "Newly diagnosed"
+            },
+            {
+                id: 4,
+                name: "Online Kenya Support Network",
+                location: "Virtual (Nationwide)",
+                meetingTime: "Every Wednesday, 7:00 PM - 8:30 PM",
+                meetingType: "Virtual Only",
+                description: "Connect with others across Kenya from the comfort of your home. Perfect for those with mobility issues or in remote areas.",
+                contact: "online.kenya@cancerrada.co.ke",
+                focus: "All stages"
+            },
+            {
+                id: 5,
+                name: "Nakuru Caregivers Circle",
+                location: "Nakuru, Kenya",
+                meetingTime: "Every Friday, 4:00 PM - 5:30 PM",
+                meetingType: "In-person",
+                description: "A dedicated space for caregivers of breast cancer patients. Share challenges, resources, and self-care strategies.",
+                contact: "nakuru.caregivers@cancerrada.co.ke",
+                focus: "Caregivers"
+            },
+            {
+                id: 6,
+                name: "Young Women's Network",
+                location: "Nairobi & Virtual",
+                meetingTime: "Every Sunday, 3:00 PM - 4:30 PM",
+                meetingType: "In-person & Virtual",
+                description: "Specifically for women under 40 dealing with breast cancer. Address unique challenges faced by younger patients.",
+                contact: "young.women@cancerrada.co.ke",
+                focus: "Under 40"
+            }
+        ];
+
+        // Educational resources data
+        const educationalResources = [
+            {
+                id: 1,
+                title: "Breast Self-Examination Guide",
+                description: "Step-by-step instructions with illustrations for performing monthly breast self-exams. Available in English and Swahili.",
+                fileType: "PDF",
+                fileSize: "2.4 MB",
+                icon: "fas fa-hand-holding-medical",
+                downloadUrl: "#"
+            },
+            {
+                id: 2,
+                title: "Understanding Breast Cancer Risks",
+                description: "Comprehensive guide to breast cancer risk factors, genetic testing, and prevention strategies tailored for Kenyan women.",
+                fileType: "PDF",
+                fileSize: "3.1 MB",
+                icon: "fas fa-dna",
+                downloadUrl: "#"
+            },
+            {
+                id: 3,
+                title: "Nutrition for Breast Health",
+                description: "Dietary recommendations and recipes to support breast health and overall wellness during and after treatment.",
+                fileType: "PDF",
+                fileSize: "4.2 MB",
+                icon: "fas fa-apple-alt",
+                downloadUrl: "#"
+            },
+            {
+                id: 4,
+                title: "Treatment Options Overview",
+                description: "Clear explanation of surgery, chemotherapy, radiation, and other breast cancer treatments available in Kenya.",
+                fileType: "PDF",
+                fileSize: "2.8 MB",
+                icon: "fas fa-stethoscope",
+                downloadUrl: "#"
+            },
+            {
+                id: 5,
+                title: "Coping with Diagnosis",
+                description: "Emotional support guide for dealing with a breast cancer diagnosis, including mindfulness techniques and coping strategies.",
+                fileType: "PDF",
+                fileSize: "1.9 MB",
+                icon: "fas fa-heart",
+                downloadUrl: "#"
+            },
+            {
+                id: 6,
+                title: "Financial Resources Guide",
+                description: "Information about financial assistance programs, insurance options, and cost-saving tips for treatment in Kenya.",
+                fileType: "PDF",
+                fileSize: "2.1 MB",
+                icon: "fas fa-hand-holding-usd",
+                downloadUrl: "#"
+            },
+            {
+                id: 7,
+                title: "Exercise During Treatment",
+                description: "Safe and effective exercise routines for maintaining strength and reducing side effects during breast cancer treatment.",
+                fileType: "PDF",
+                fileSize: "3.5 MB",
+                icon: "fas fa-running",
+                downloadUrl: "#"
+            },
+            {
+                id: 8,
+                title: "Family Communication Guide",
+                description: "Tips for talking to children, partners, and family members about your breast cancer diagnosis and treatment.",
+                fileType: "PDF",
+                fileSize: "2.3 MB",
+                icon: "fas fa-comments",
+                downloadUrl: "#"
+            }
+        ];
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Resource buttons
-            document.getElementById('find-center-btn').addEventListener('click', function() {
+            // Prevention Tips Popup
+            setTimeout(function() {
+                document.getElementById('prevention-tip').style.display = 'block';
+            }, 5000);
+
+            // Close tip functionality
+            document.getElementById('close-tip').addEventListener('click', function() {
+                document.getElementById('prevention-tip').style.display = 'none';
+            });
+
+            // Prevention modal functionality
+            document.getElementById('learn-prevention').addEventListener('click', function() {
+                document.getElementById('prevention-modal').style.display = 'block';
+            });
+
+            document.getElementById('close-prevention-modal').addEventListener('click', function() {
+                document.getElementById('prevention-modal').style.display = 'none';
+            });
+
+            // Centers modal functionality
+            document.getElementById('view-centers').addEventListener('click', function() {
                 document.getElementById('centers-modal').style.display = 'block';
             });
-            
-            document.getElementById('join-group-btn').addEventListener('click', function() {
-                document.getElementById('groups-modal').style.display = 'block';
-            });
-            
-            document.getElementById('learn-more-btn').addEventListener('click', function() {
-                document.getElementById('financial-modal').style.display = 'block';
-            });
-            
-            // Close modal buttons
+
             document.getElementById('close-centers-modal').addEventListener('click', function() {
                 document.getElementById('centers-modal').style.display = 'none';
             });
-            
-            document.getElementById('close-groups-modal').addEventListener('click', function() {
-                document.getElementById('groups-modal').style.display = 'none';
+
+            // Support groups modal functionality
+            document.getElementById('view-support-groups').addEventListener('click', function() {
+                document.getElementById('support-groups-modal').style.display = 'block';
+                renderSupportGroups();
             });
-            
-            document.getElementById('close-financial-modal').addEventListener('click', function() {
-                document.getElementById('financial-modal').style.display = 'none';
+
+            document.getElementById('close-support-groups-modal').addEventListener('click', function() {
+                document.getElementById('support-groups-modal').style.display = 'none';
             });
-            
-            // Close modals when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.style.display = 'none';
-                }
+
+            // NEW: Educational resources modal functionality
+            document.getElementById('view-educational-resources').addEventListener('click', function() {
+                document.getElementById('educational-resources-modal').style.display = 'block';
+                renderEducationalResources();
             });
-            
+
+            document.getElementById('close-educational-resources-modal').addEventListener('click', function() {
+                document.getElementById('educational-resources-modal').style.display = 'none';
+            });
+
             // Image upload functionality
-            document.getElementById('choose-image-btn').addEventListener('click', function() {
-                document.getElementById('image-input').click();
+            const uploadInput = document.getElementById('mammogram-upload');
+            const uploadedImage = document.getElementById('uploaded-image');
+            const uploadTrigger = document.getElementById('upload-trigger');
+            const fileName = document.getElementById('file-name');
+            const analyzeBtn = document.getElementById('analyze-image');
+
+            uploadTrigger.addEventListener('click', function() {
+                uploadInput.click();
             });
-            
-            document.getElementById('image-input').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
+
+            uploadInput.addEventListener('change', function(e) {
+                if(e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    fileName.textContent = file.name;
+
                     const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const img = document.getElementById('uploaded-image');
-                        img.src = event.target.result;
-                        img.style.display = 'block';
-                    };
+
+                    reader.onload = function(e) {
+                        uploadedImage.src = e.target.result;
+                        uploadedImage.style.display = 'block';
+                        analyzeBtn.disabled = false;
+                    }
+
                     reader.readAsDataURL(file);
                 }
             });
-            
-            // Medical records upload
-            document.getElementById('upload-medical-btn').addEventListener('click', function() {
-                document.getElementById('medical-records').click();
+
+            // Analyze image functionality
+            analyzeBtn.addEventListener('click', function() {
+                const imageResult = document.getElementById('image-result');
+                imageResult.style.display = 'block';
+
+                // Simulate AI analysis
+                setTimeout(function() {
+                    const analysisResults = [
+                        "No suspicious masses detected. Regular screening recommended.",
+                        "Minor density variations noted. Follow-up in 6 months suggested.",
+                        "Potential abnormality detected. Consultation with specialist recommended."
+                    ];
+
+                    const randomResult = analysisResults[Math.floor(Math.random() * analysisResults.length)];
+                    document.getElementById('image-result-description').textContent = randomResult;
+
+                    imageResult.scrollIntoView({ behavior: 'smooth' });
+                }, 1500);
             });
-            
-            document.getElementById('medical-records').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    document.getElementById('medical-file-name').textContent = file.name;
-                }
-            });
-            
-            // Download form functionality
-            document.getElementById('download-form-btn').addEventListener('click', function() {
-                // Create a printable version of the form
-                const formContent = document.getElementById('risk-form').innerHTML;
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <html>
-                    <head>
-                        <title>CancerRada - Breast Cancer Risk Assessment Form</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
-                            h1 { color: #e75480; text-align: center; }
-                            .form-section { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-                            .form-section-title { color: #e75480; border-bottom: 1px solid #ffb6c1; padding-bottom: 5px; }
-                            .form-group { margin-bottom: 15px; }
-                            label { display: block; margin-bottom: 5px; font-weight: bold; }
-                            .form-check { margin-bottom: 5px; }
-                            .disclaimer { margin-top: 30px; padding: 15px; background-color: #f5f5f5; border-radius: 5px; font-size: 0.9em; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>CancerRada - Breast Cancer Risk Assessment Form</h1>
-                        <p><strong>Instructions:</strong> Please fill out this form and bring it to your healthcare provider for discussion.</p>
-                        ${formContent}
-                        <div class="disclaimer">
-                            <p><strong>Disclaimer:</strong> This assessment tool is for educational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.</p>
-                        </div>
-                        <p style="text-align: center; margin-top: 30px;">Generated by CancerRada - ${new Date().toLocaleDateString()}</p>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                printWindow.print();
-            });
-            
-            // Peer group functionality
-            document.getElementById('peer-group-btn').addEventListener('click', function() {
-                document.getElementById('groups-modal').style.display = 'block';
-            });
-            
-            // Image analysis functionality
-            document.getElementById('analyze-image-btn').addEventListener('click', analyzeImage);
-            
-            // Risk assessment form submission
-            document.getElementById('risk-form').addEventListener('submit', function(e) {
+
+            // Risk calculator functionality
+            const riskForm = document.getElementById('risk-calculator-form');
+            riskForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 calculateRisk();
             });
+
+            // Save risk to tracker
+            document.getElementById('save-risk').addEventListener('click', function() {
+                saveRiskToTracker();
+            });
+
+            // Combined analysis
+            document.getElementById('combined-analysis').addEventListener('click', function() {
+                performCombinedAnalysis();
+            });
+
+            // Find specialists button
+            document.getElementById('find-specialists').addEventListener('click', function() {
+                document.getElementById('centers-modal').style.display = 'block';
+            });
+
+            // Show resources button
+            document.getElementById('show-resources').addEventListener('click', function() {
+                document.getElementById('resources').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // AI Assistant functionality
+            const aiAssistant = document.getElementById('ai-assistant');
+            const aiChat = document.getElementById('ai-chat');
+            const aiMessages = document.getElementById('ai-messages');
+            const aiInput = document.getElementById('ai-input');
+            const aiSend = document.getElementById('ai-send');
+
+            aiAssistant.addEventListener('click', function() {
+                aiChat.style.display = aiChat.style.display === 'flex' ? 'none' : 'flex';
+            });
+
+            aiSend.addEventListener('click', sendMessage);
+            aiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendMessage();
+            });
+
+            function sendMessage() {
+                const message = aiInput.value.trim();
+                if (message === '') return;
+
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'ai-message user';
+                userMessage.textContent = message;
+                aiMessages.appendChild(userMessage);
+
+                // Clear input
+                aiInput.value = '';
+
+                // Scroll to bottom
+                aiMessages.scrollTop = aiMessages.scrollHeight;
+
+                // Simulate AI response
+                setTimeout(function() {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'ai-message bot';
+                    botMessage.textContent = generateAIResponse(message);
+                    aiMessages.appendChild(botMessage);
+
+                    // Scroll to bottom
+                    aiMessages.scrollTop = aiMessages.scrollHeight;
+                }, 1000);
+            }
+
+            function generateAIResponse(message) {
+                const lowerMessage = message.toLowerCase();
+
+                // Check if the message is in Swahili
+                const isSwahili = lowerMessage.includes("swahili") ||
+                                  lowerMessage.includes("magonjwa") ||
+                                  lowerMessage.includes("kansa") ||
+                                  lowerMessage.includes("matibabu");
+
+                if (isSwahili) {
+                    if (lowerMessage.includes("hatari") || lowerMessage.includes("vipimo")) {
+                        return "Kulingana na data, viashiria vya hatari ya kansa ya matiti ni umri, historia ya familia, jenetikia, na mtindo wa maisha. Tumia chombo hiki cha kupima hatari yako.";
+                    } else if (lowerMessage.includes("dalili")) {
+                        return "Dalili za kansa ya matiti ni pamoja na kichugu, mabadiliko ya umbo la matiti, kupungua kwa ngozi, kutoka kwa kipunyaji, au mabadiliko ya rangi. Lakini, mabadiliko mengi ya matiti hayajihusishi na kansa. Daima uliza daktari kwa uchunguzi sahihi.";
+                    } else if (lowerMessage.includes("kuepusha") || lowerMessage.includes("kinga")) {
+                        return "Ili kupunguza hatari ya kansa ya matiti, uhakikishe una uzito wa afya, kutumia mazoezi ya kutosha, kupunguza kunywa pombe, na kujiepusha na uvutaji sigara. Pima za maradhi ya kawaida pia husaidia kugundua mapema.";
+                    } else if (lowerMessage.includes("nyaraka") || lowerMessage.includes("kupakua")) {
+                        return "Tuna nyaraka nyingi muhimu kuhusu kansa ya matiti unaweza kupakua. Bonyeza kitufe cha 'Download Resources' kwenye sehemu ya Rasilimali ili kupata vyanzo vyote vya elimu.";
+                    } else {
+                        return "Niko hapa kusaidia na habari kuhusu kansa ya matiti. Unaweza kuniuliza kuhusu viashiria vya hatari, dalili, njia za kuepusha, matibabu, au rasilimali za ndani ya Kenya. Je, una maswali mengine?";
+                    }
+                } else {
+                    // English responses (existing logic)
+                    if (lowerMessage.includes('risk') || lowerMessage.includes('probability')) {
+                        return "Based on available data, breast cancer risk factors include age, family history, genetics, and lifestyle. Use our risk assessment tool for a personalized evaluation.";
+                    } else if (lowerMessage.includes('symptom')) {
+                        return "Common breast cancer symptoms include lumps, changes in breast shape, skin dimpling, nipple discharge, or redness. However, many breast changes are not cancerous. Always consult a healthcare provider for proper diagnosis.";
+                    } else if (lowerMessage.includes('prevent') || lowerMessage.includes('avoid')) {
+                        return "While not all breast cancer can be prevented, you can reduce risk by maintaining a healthy weight, exercising regularly, limiting alcohol, and avoiding smoking. Regular screenings also help with early detection.";
+                    } else if (lowerMessage.includes('treatment') || lowerMessage.includes('cure')) {
+                        return "Breast cancer treatment depends on the type and stage, and may include surgery, radiation, chemotherapy, hormone therapy, or targeted therapy. Early detection significantly improves treatment outcomes.";
+                    } else if (lowerMessage.includes('kenya') || lowerMessage.includes('local')) {
+                        return "In Kenya, breast cancer screening is available at major hospitals like Nairobi Hospital, Aga Khan Hospital, and Kenyatta National Hospital. Our health mapping feature shows locations of screening centers across the country.";
+                    } else if (lowerMessage.includes('support') || lowerMessage.includes('group')) {
+                        return "We have several support groups across Kenya. Click 'Find Support' in the Resources section to see available groups, meeting times, and how to join.";
+                    } else if (lowerMessage.includes('download') || lowerMessage.includes('resource') || lowerMessage.includes('material')) {
+                        return "We have many educational materials about breast cancer prevention, early detection, and treatment. Click 'Download Resources' in the Resources section to access all our educational materials.";
+                    } else {
+                        return "I'm here to help with breast cancer information. You can ask me about risk factors, symptoms, prevention, treatment options, or local resources in Kenya. How else can I assist you?";
+                    }
+                }
+            }
+
+            // Initialize Health Map
+            function initHealthMap() {
+                const map = L.map('health-map').setView([-1.286389, 36.817223], 6);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Add some sample markers for healthcare facilities
+                const facilities = [
+                    { name: "Nairobi Hospital", lat: -1.3000, lng: 36.8060, type: "screening" },
+                    { name: "Aga Khan Hospital", lat: -1.2584, lng: 36.7961, type: "treatment" },
+                    { name: "Kenyatta National Hospital", lat: -1.3044, lng: 36.8016, type: "treatment" },
+                    { name: "Mombasa Hospital", lat: -4.0435, lng: 39.6682, type: "screening" },
+                    { name: "Kisumu County Hospital", lat: -0.0917, lng: 34.7680, type: "screening" },
+                    { name: "Nakuru Provincial Hospital", lat: -0.3031, lng: 36.0800, type: "treatment" }
+                ];
+
+                facilities.forEach(facility => {
+                    const marker = L.marker([facility.lat, facility.lng]).addTo(map);
+                    marker.bindPopup(`<b>${facility.name}</b><br>Type: ${facility.type === 'screening' ? 'Screening Center' : 'Treatment Center'}`);
+                });
+
+                // Filter functionality
+                document.getElementById('county-select').addEventListener('change', function() {
+                    console.log('County filter changed:', this.value);
+                });
+
+                document.getElementById('resource-type').addEventListener('change', function() {
+                    console.log('Resource type filter changed:', this.value);
+                });
+            }
+
+            // Initialize the map
+            initHealthMap();
+
+            // Risk Tracker functionality
+            function loadRiskHistory() {
+                const history = JSON.parse(localStorage.getItem('cancerradaRiskHistory')) || [];
+                const timeline = document.getElementById('risk-timeline');
+
+                timeline.innerHTML = '';
+
+                if (history.length === 0) {
+                    timeline.innerHTML = '<p>No risk assessments saved yet. Complete the risk calculator to start tracking.</p>';
+                    return;
+                }
+
+                history.forEach((entry, index) => {
+                    const riskPoint = document.createElement('div');
+                    riskPoint.className = 'risk-point';
+
+                    const riskLevelClass = entry.riskLevel === 'low' ? 'low' :
+                                          entry.riskLevel === 'medium' ? 'medium' : 'high';
+
+                    riskPoint.innerHTML = `
+                        <div class="risk-date">${new Date(entry.date).getDate()}</div>
+                        <div class="risk-details">
+                            <span class="risk-level ${riskLevelClass}">${entry.riskLevel.toUpperCase()} RISK</span>
+                            <p><strong>${entry.riskScore}%</strong> - ${entry.description}</p>
+                        </div>
+                    `;
+
+                    timeline.appendChild(riskPoint);
+                });
+            }
+
+            function saveRiskToTracker() {
+                const riskScore = document.getElementById('probability-text').textContent.match(/\d+/)[0];
+                const riskLevel = document.getElementById('result').classList[1].split('-')[1];
+                const description = document.getElementById('result-description').textContent;
+
+                const entry = {
+                    date: new Date().toISOString(),
+                    riskScore: parseInt(riskScore),
+                    riskLevel: riskLevel,
+                    description: description
+                };
+
+                const history = JSON.parse(localStorage.getItem('cancerradaRiskHistory')) || [];
+                history.unshift(entry);
+
+                // Keep only last 10 entries
+                if (history.length > 10) history.pop();
+
+                localStorage.setItem('cancerradaRiskHistory', JSON.stringify(history));
+                loadRiskHistory();
+
+                alert('Risk assessment saved to your tracker!');
+            }
+
+            function performCombinedAnalysis() {
+                alert('Combined analysis feature would integrate your image results with risk factors for a comprehensive assessment. In a full implementation, this would use advanced AI algorithms.');
+            }
+
+            // Clear history button
+            document.getElementById('clear-history').addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear your risk history?')) {
+                    localStorage.removeItem('cancerradaRiskHistory');
+                    loadRiskHistory();
+                }
+            });
+
+            // Load risk history on page load
+            loadRiskHistory();
+
+            // Add touch-friendly improvements for mobile
+            const buttons = document.querySelectorAll('.btn, .upload-btn, .download-btn, .peer-group-btn');
+            
+            buttons.forEach(button => {
+                // Add active state for touch feedback
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
         });
 
-        // Image Analysis Function (Simulated)
-        function analyzeImage() {
-            // In a real implementation, this would send the image to a backend for analysis
-            // For this demo, we'll simulate a response with a random probability
-            
-            const resultDiv = document.getElementById('image-result');
-            const analysisText = document.getElementById('analysis-text');
-            const analysisMeter = document.getElementById('analysis-meter');
-            const analysisPercentage = document.getElementById('analysis-percentage');
-            
-            // Simulate analysis delay
-            resultDiv.style.display = 'none';
-            
-            setTimeout(function() {
-                // Generate a random probability between 5% and 85%
-                const probability = Math.floor(Math.random() * 80) + 5;
-                
-                // Set the analysis text based on probability
-                if (probability < 20) {
-                    analysisText.textContent = "Our preliminary analysis indicates minimal concerns. No significant abnormalities detected.";
-                } else if (probability < 50) {
-                    analysisText.textContent = "Our preliminary analysis indicates some minor areas of interest that may warrant further investigation.";
-                } else {
-                    analysisText.textContent = "Our preliminary analysis indicates potential areas of concern that should be evaluated by a healthcare professional.";
-                }
-                
-                // Update the probability meter and text
-                analysisMeter.style.width = probability + '%';
-                analysisPercentage.textContent = "Estimated Concern: " + probability + "%";
-                
-                // Show the result
-                resultDiv.style.display = 'block';
-                resultDiv.scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
+        // Render support groups
+        function renderSupportGroups() {
+            const container = document.getElementById('support-groups-container');
+            container.innerHTML = '';
+
+            supportGroups.forEach(group => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'support-group-card';
+                groupCard.innerHTML = `
+                    <div class="support-group-header">
+                        <h3>${group.name}</h3>
+                        <p>${group.location}</p>
+                    </div>
+                    <div class="support-group-body">
+                        <div class="support-group-detail">
+                            <i class="fas fa-clock"></i>
+                            <span><strong>Meeting Time:</strong> ${group.meetingTime}</span>
+                        </div>
+                        <div class="support-group-detail">
+                            <i class="fas fa-laptop-house"></i>
+                            <span><strong>Format:</strong> ${group.meetingType}</span>
+                        </div>
+                        <div class="support-group-detail">
+                            <i class="fas fa-bullseye"></i>
+                            <span><strong>Focus:</strong> ${group.focus}</span>
+                        </div>
+                        <div class="support-group-description">
+                            ${group.description}
+                        </div>
+                        <div class="support-group-actions">
+                            <button class="btn btn-primary join-group-btn" data-group-id="${group.id}">
+                                <i class="fas fa-user-plus"></i> Join Group
+                            </button>
+                            <button class="btn btn-secondary contact-group-btn" data-group-contact="${group.contact}">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                        <div class="join-form" id="join-form-${group.id}">
+                            <h4>Join ${group.name}</h4>
+                            <div class="form-group">
+                                <label for="name-${group.id}">Full Name</label>
+                                <input type="text" id="name-${group.id}" class="form-control" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-${group.id}">Email Address</label>
+                                <input type="email" id="email-${group.id}" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone-${group.id}">Phone Number</label>
+                                <input type="tel" id="phone-${group.id}" class="form-control" placeholder="Enter your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="message-${group.id}">Brief Message (Optional)</label>
+                                <textarea id="message-${group.id}" class="form-control" rows="3" placeholder="Tell us a bit about yourself and why you'd like to join"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-primary submit-join-btn" data-group-id="${group.id}">
+                                    <i class="fas fa-paper-plane"></i> Submit Request
+                                </button>
+                                <button type="button" class="btn btn-secondary cancel-join-btn" data-group-id="${group.id}">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(groupCard);
+            });
+
+            // Add event listeners for the new buttons
+            document.querySelectorAll('.join-group-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const groupId = this.getAttribute('data-group-id');
+                    const joinForm = document.getElementById(`join-form-${groupId}`);
+                    joinForm.classList.toggle('active');
+                });
+            });
+
+            document.querySelectorAll('.contact-group-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const contactEmail = this.getAttribute('data-group-contact');
+                    window.location.href = `mailto:${contactEmail}?subject=Inquiry about Support Group`;
+                });
+            });
+
+            document.querySelectorAll('.submit-join-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const groupId = this.getAttribute('data-group-id');
+                    submitJoinRequest(groupId);
+                });
+            });
+
+            document.querySelectorAll('.cancel-join-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const groupId = this.getAttribute('data-group-id');
+                    const joinForm = document.getElementById(`join-form-${groupId}`);
+                    joinForm.classList.remove('active');
+                });
+            });
         }
 
-        // Risk Assessment Calculation
-        function calculateRisk() {
-            // Hide all results first
-            document.getElementById('result-low').style.display = 'none';
-            document.getElementById('result-medium').style.display = 'none';
-            document.getElementById('result-high').style.display = 'none';
-            
-            // Get form values
-            const age = parseInt(document.getElementById('age').value);
-            const gender = document.getElementById('gender').value;
-            const familyHistory = document.querySelector('input[name="family"]:checked').value;
-            
-            // Simple risk calculation (for demonstration only)
-            let riskScore = 0;
-            
-            // Age factor
-            if (age > 50) riskScore += 2;
-            else if (age > 40) riskScore += 1;
-            
-            // Gender factor (women have higher baseline risk)
-            if (gender === 'female') riskScore += 2;
-            
-            // Family history factor
-            if (familyHistory === 'parent') riskScore += 3;
-            else if (familyHistory === 'relative') riskScore += 1;
-            else if (familyHistory === 'multiple') riskScore += 4;
-            
-            // Determine risk level
-            let resultElement;
-            if (riskScore <= 2) {
-                resultElement = document.getElementById('result-low');
-            } else if (riskScore <= 4) {
-                resultElement = document.getElementById('result-medium');
-            } else {
-                resultElement = document.getElementById('result-high');
-            }
-            
-            // Show appropriate result
-            resultElement.style.display = 'block';
-            
-            // Scroll to result
-            resultElement.scrollIntoView({ behavior: 'smooth' });
+        // NEW: Render educational resources
+        function renderEducationalResources() {
+            const container = document.getElementById('resources-container');
+            container.innerHTML = '';
+
+            educationalResources.forEach(resource => {
+                const resourceItem = document.createElement('div');
+                resourceItem.className = 'resource-item';
+                resourceItem.innerHTML = `
+                    <div class="resource-icon">
+                        <i class="${resource.icon}"></i>
+                    </div>
+                    <div class="resource-details">
+                        <h3>${resource.title}</h3>
+                        <div class="resource-meta">
+                            <span><i class="fas fa-file"></i> ${resource.fileType}</span>
+                            <span><i class="fas fa-weight"></i> ${resource.fileSize}</span>
+                        </div>
+                        <p class="resource-description">${resource.description}</p>
+                        <div class="resource-actions">
+                            <button class="btn btn-primary download-resource-btn" data-resource-id="${resource.id}">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="btn btn-secondary preview-resource-btn" data-resource-id="${resource.id}">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(resourceItem);
+            });
+
+            // Add event listeners for download buttons
+            document.querySelectorAll('.download-resource-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resourceId = this.getAttribute('data-resource-id');
+                    downloadResource(resourceId);
+                });
+            });
+
+            // Add event listener for download all button
+            document.getElementById('download-all-resources').addEventListener('click', function() {
+                downloadAllResources();
+            });
+
+            // Add event listeners for preview buttons
+            document.querySelectorAll('.preview-resource-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const resourceId = this.getAttribute('data-resource-id');
+                    previewResource(resourceId);
+                });
+            });
         }
+
+        // NEW: Download individual resource
+        function downloadResource(resourceId) {
+            const resource = educationalResources.find(r => r.id == resourceId);
+            if (!resource) return;
+
+            // In a real implementation, this would download the actual file
+            // For demonstration, we'll create a sample PDF content
+            const content = `
+                CancerRada Educational Resource
+                ==============================
+                
+                Title: ${resource.title}
+                
+                Description: ${resource.description}
+                
+                This is a sample of the educational material that would be available
+                in the actual implementation. In a production environment, this would
+                be a comprehensive PDF document with detailed information, illustrations,
+                and resources specific to breast cancer awareness and care in Kenya.
+                
+                For more information, visit CancerRada or contact info@cancerrada.co.ke
+            `;
+
+            const blob = new Blob([content], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${resource.title.replace(/\s+/g, '_')}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            // Show download confirmation
+            alert(`Thank you! Your download of "${resource.title}" has started.`);
+        }
+
+        // NEW: Download all resources
+        function downloadAllResources() {
+            // In a real implementation, this would download a ZIP file containing all resources
+            // For demonstration, we'll create a sample content
+            const content = `
+                CancerRada Complete Educational Package
+                ======================================
+                
+                This package includes all our educational materials:
+                
+                ${educationalResources.map(r => `- ${r.title}`).join('\n')}
+                
+                In a production environment, this would be a ZIP file containing
+                all the individual PDF documents for easy access and offline use.
+                
+                For more information, visit CancerRada or contact info@cancerrada.co.ke
+            `;
+
+            const blob = new Blob([content], { type: 'application/zip' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'CancerRada_Complete_Educational_Package.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            // Show download confirmation
+            alert('Thank you! Your download of the complete educational package has started.');
+        }
+
+        // NEW: Preview resource (simulated)
+        function previewResource(resourceId) {
+            const resource = educationalResources.find(r => r.id == resourceId);
+            if (!resource) return;
+
+            // In a real implementation, this would open a preview modal or PDF viewer
+            // For demonstration, we'll show an alert with resource details
+            alert(`Preview: ${resource.title}\n\n${resource.description}\n\nThis is a preview of the educational material. Click "Download" to get the full PDF.`);
+        }
+
+        // Submit join request
+        function submitJoinRequest(groupId) {
+            const name = document.getElementById(`name-${groupId}`).value;
+            const email = document.getElementById(`email-${groupId}`).value;
+            const phone = document.getElementById(`phone-${groupId}`).value;
+            const message = document.getElementById(`message-${groupId}`).value;
+
+            if (!name || !email) {
+                alert('Please fill in at least your name and email address.');
+                return;
+            }
+
+            // In a real implementation, this would send data to a server
+            // For now, we'll just show a success message
+            const group = supportGroups.find(g => g.id == groupId);
+            alert(`Thank you, ${name}! Your request to join ${group.name} has been submitted. The group coordinator will contact you at ${email} within 2 business days.`);
+            
+            // Reset form and hide it
+            document.getElementById(`join-form-${groupId}`).classList.remove('active');
+            document.getElementById(`name-${groupId}`).value = '';
+            document.getElementById(`email-${groupId}`).value = '';
+            document.getElementById(`phone-${groupId}`).value = '';
+            document.getElementById(`message-${groupId}`).value = '';
+        }
+
+        function calculateRisk() {
+            // Get form values
+            const age = parseInt(document.getElementById('age').value) || 0;
+            const gender = document.getElementById('gender').value;
+            const familyHistory = document.getElementById('family-history').checked;
+            const multipleRelatives = document.getElementById('multiple-relatives').checked;
+            const maleRelative = document.getElementById('male-relative').checked;
+            const previousCancer = document.getElementById('previous-cancer').checked;
+            const biopsy = document.getElementById('biopsy').checked;
+            const denseBreasts = document.getElementById('dense-breasts').checked;
+            const firstPeriod = document.getElementById('first-period').value;
+            const firstChild = document.getElementById('first-child').value;
+            const menopause = document.getElementById('menopause').checked;
+            const alcohol = document.getElementById('alcohol').checked;
+            const smoking = document.getElementById('smoking').checked;
+            const exercise = document.getElementById('exercise').checked;
+
+            // Calculate risk score (simplified algorithm for demonstration)
+            let riskScore = 5; // Base risk
+
+            // Age factors
+            if (age < 30) riskScore += 0;
+            else if (age < 40) riskScore += 5;
+            else if (age < 50) riskScore += 10;
+            else if (age < 60) riskScore += 15;
+            else riskScore += 20;
+
+            // Gender factors
+            if (gender === 'female') riskScore += 15;
+            else riskScore += 1;
+
+            // Family history
+            if (familyHistory) riskScore += 20;
+            if (multipleRelatives) riskScore += 25;
+            if (maleRelative) riskScore += 15;
+
+            // Personal health history
+            if (previousCancer) riskScore += 30;
+            if (biopsy) riskScore += 10;
+            if (denseBreasts) riskScore += 5;
+
+            // Reproductive history
+            if (firstPeriod === 'under-12') riskScore += 5;
+            if (firstChild === 'over-30' || firstChild === 'no-children') riskScore += 5;
+            if (menopause) riskScore -= 5;
+
+            // Lifestyle factors
+            if (alcohol) riskScore += 5;
+            if (smoking) riskScore += 5;
+            if (exercise) riskScore -= 10;
+
+            // Cap the risk score
+            riskScore = Math.max(5, Math.min(riskScore, 95));
+
+            // Determine risk level
+            let riskLevel, riskDescription;
+            if (riskScore < 20) {
+                riskLevel = 'low';
+                riskDescription = 'Based on your responses, you have a lower than average risk of developing breast cancer. Continue with regular screenings as recommended for your age group.';
+            } else if (riskScore < 50) {
+                riskLevel = 'medium';
+                riskDescription = 'Based on your responses, you have an average to moderately increased risk of developing breast cancer. Discuss screening options with your healthcare provider.';
+            } else {
+                riskLevel = 'high';
+                riskDescription = 'Based on your responses, you have an increased risk of developing breast cancer. We recommend consulting with a healthcare provider about personalized screening and risk reduction strategies.';
+            }
+
+            // Display results
+            displayResult(riskLevel, riskScore, riskDescription);
+        }
+
+        function displayResult(riskLevel, riskScore, description) {
+            const resultDiv = document.getElementById('result');
+            const probabilityFill = document.getElementById('probability-fill');
+            const probabilityText = document.getElementById('probability-text');
+            const resultTitle = document.getElementById('result-title');
+            const resultDescription = document.getElementById('result-description');
+
+            // Set result class and content based on risk level
+            resultDiv.className = 'result result-' + riskLevel;
+            resultDiv.style.display = 'block';
+
+            // Set probability meter
+            probabilityFill.style.width = riskScore + '%';
+            probabilityText.textContent = 'Estimated Risk: ' + riskScore + '%';
+
+            // Set appropriate color for probability fill
+            if(riskLevel === 'low') {
+                probabilityFill.style.background = 'var(--success)';
+                resultTitle.textContent = 'Lower Risk Assessment';
+            } else if(riskLevel === 'medium') {
+                probabilityFill.style.background = 'var(--warning)';
+                resultTitle.textContent = 'Moderate Risk Assessment';
+            } else {
+                probabilityFill.style.background = 'var(--danger)';
+                resultTitle.textContent = 'Higher Risk Assessment';
+            }
+
+            resultDescription.textContent = description;
+
+            // Scroll to result
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadGuide() {
+            // Replace with the actual URL of your PDF guide
+            const pdfUrl = "https://example.com/path/to/breast-health-guide.pdf";
+
+            // Create a temporary anchor element
+            const link = document.createElement("a");
+            link.href = pdfUrl;
+            link.download = "Breast_Health_Guide.pdf";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function joinSupportNetwork() {
+            // Replace with the actual URL of your support network
+            const supportUrl = "https://example.com/support-network";
+            window.open(supportUrl, "_blank");
+        }
+
+        function downloadRiskAssessment() {
+            // Get the risk assessment details
+            const riskLevel = document.getElementById('result').classList[1].split('-')[1];
+            const riskScore = document.getElementById('probability-text').textContent;
+            const description = document.getElementById('result-description').textContent;
+
+            // Create a text blob for the assessment
+            const assessmentText = `
+                Breast Cancer Risk Assessment
+                ------------------------------
+                Risk Level: ${riskLevel}
+                Risk Score: ${riskScore}
+                Description: ${description}
+
+                Note: This assessment is for informational purposes only. Consult a healthcare provider for professional advice.
+            `;
+
+            // Create a download link
+            const blob = new Blob([assessmentText], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "Breast_Cancer_Risk_Assessment.txt";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const preventionModal = document.getElementById('prevention-modal');
+            const centersModal = document.getElementById('centers-modal');
+            const supportGroupsModal = document.getElementById('support-groups-modal');
+            const educationalResourcesModal = document.getElementById('educational-resources-modal');
+
+            if (e.target === preventionModal) {
+                preventionModal.style.display = 'none';
+            }
+
+            if (e.target === centersModal) {
+                centersModal.style.display = 'none';
+            }
+
+            if (e.target === supportGroupsModal) {
+                supportGroupsModal.style.display = 'none';
+            }
+
+            if (e.target === educationalResourcesModal) {
+                educationalResourcesModal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
